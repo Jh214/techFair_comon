@@ -1,4 +1,4 @@
 package techfair_comon.entity;
 
-public class VoteEntity {
+public class Chat {
 }

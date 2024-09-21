@@ -1,4 +1,4 @@
 package techfair_comon.entity;
 
-public class BgEntity {
+public class User {
 }

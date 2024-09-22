@@ -1,4 +1,4 @@
 package techfair_comon.user.service;
 
-public class UserProfileService {
+public class UserService {
 }

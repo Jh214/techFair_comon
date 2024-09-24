@@ -1,10 +1,10 @@
-package techfair_comon.bg;
+package techfair_comon.bg.service;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import techfair_comon.ResponseDto;
+import techfair_comon.bg.repository.BgRepository;
 import techfair_comon.bg.dto.CreateBgDto;
 import techfair_comon.bg.dto.GetBgDto;
 import techfair_comon.entity.Bg;

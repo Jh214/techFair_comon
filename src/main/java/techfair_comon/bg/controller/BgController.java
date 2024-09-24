@@ -1,9 +1,11 @@
-package techfair_comon.bg;
+package techfair_comon.bg.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import techfair_comon.ResponseDto;
+import techfair_comon.bg.dto.VoteDto;
+import techfair_comon.bg.service.BgService;
 import techfair_comon.bg.dto.CreateBgDto;
 import techfair_comon.bg.dto.GetBgDto;
 import techfair_comon.entity.Bg;
@@ -43,4 +45,9 @@ public class BgController {
         return bgService.deleteBg(bg);
     }
 
+    /*@PostMapping("vote")
+    public ResponseDto<Void> voteBg(@RequestBody @Valid VoteDto voteDto) {
+
+    }
+*/
 }

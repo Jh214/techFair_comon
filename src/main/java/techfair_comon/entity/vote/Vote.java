@@ -2,14 +2,13 @@ package techfair_comon.entity.vote;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import techfair_comon.entity.Bg;
 import techfair_comon.entity.User;
 
 @Entity
 @Table(name = "vote")
 @IdClass(VoteId.class)  // 복합 키 사용
-@Getter @Setter
+@Getter
 public class Vote {
 
     @Id

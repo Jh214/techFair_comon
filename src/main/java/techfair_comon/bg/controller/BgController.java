@@ -33,15 +33,13 @@ public class BgController {
 
     @GetMapping("{bgNo}")
     public ResponseDto<GetBgDto> getBgById(@PathVariable("bgNo") Long bgNo) {
-        Bg bg = new Bg();
-        bg.setBgNo(bgNo);
+        Bg bg = Bg.builder().bgNo(bgNo).build();
         return bgService.getBgByBgId(bg);
     }
 
     @DeleteMapping("{bgNo}") /*0924 현재접속 userId로 삭제권한 부여 미구현*/
     public ResponseDto<Void> deleteBg(@PathVariable("bgNo") Long bgNo) {
-        Bg bg = new Bg();
-        bg.setBgNo(bgNo);
+        Bg bg = Bg.builder().bgNo(bgNo).build();
         return bgService.deleteBg(bg);
     }
 

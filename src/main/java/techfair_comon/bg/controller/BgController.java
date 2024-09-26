@@ -21,7 +21,7 @@ import java.util.List;
 public class BgController {
     private final BgService bgService;
 
-    @PostMapping("create") /*0924 userId 저장하는부분 미구현*/
+    @PostMapping("/create") /*0924 userId 저장하는부분 미구현*/
     public ResponseDto<Void> createBg(@RequestBody @Valid CreateBgDto createBgDto) {
         return bgService.createBg(createBgDto);
     }
@@ -31,21 +31,20 @@ public class BgController {
         return bgService.getAllBgs();
     }
 
-    @GetMapping("{bgNo}")
+    @GetMapping("/{bgNo}")
     public ResponseDto<GetBgDto> getBgById(@PathVariable("bgNo") Long bgNo) {
         Bg bg = Bg.builder().bgNo(bgNo).build();
         return bgService.getBgByBgId(bg);
     }
 
-    @DeleteMapping("{bgNo}") /*0924 현재접속 userId로 삭제권한 부여 미구현*/
+    @DeleteMapping("/{bgNo}") /*0924 현재접속 userId로 삭제권한 부여 미구현*/
     public ResponseDto<Void> deleteBg(@PathVariable("bgNo") Long bgNo) {
         Bg bg = Bg.builder().bgNo(bgNo).build();
         return bgService.deleteBg(bg);
     }
 
-    /*@PostMapping("vote")
+    /*@PostMapping("/vote")
     public ResponseDto<Void> voteBg(@RequestBody @Valid VoteDto voteDto) {
 
-    }
-*/
+    }*/
 }

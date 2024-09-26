@@ -1,15 +1,24 @@
 package techfair_comon.entity.vote;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-@Getter @Setter
+@Getter
+@Builder
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class VoteId implements Serializable {
-    private Long userNo; // User ID
-    private Long bgNo;   // Bg ID
+
+
+    @Column(name = "user_no")
+    private Long userNo;
+    @Column(name = "bg_no")
+    private Long bgNo;
 
     @Override
     public boolean equals(Object o) {

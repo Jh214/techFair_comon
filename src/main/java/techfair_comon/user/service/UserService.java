@@ -1,5 +1,17 @@
+/*
+    작성자: 이동주
+    버전: 17
+    기능: 로그인, 회원가입
+
+    작성자: 김주현
+    버전: 17
+    기능: 회원조회, 수정
+
+ */
+
 package techfair_comon.user.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,19 +25,26 @@ import techfair_comon.user.repository.UserRepository; // UserRepository 임포�
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
+
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository; // UserRepository 주입
+    //@Autowired
+    private final UserRepository userRepository; // UserRepository 주입
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
 
     // 사용자 가입 메소드
     public ResponseDto<Void> signup(SignupDTO signupDTO) {
-        // 닉네임 필드 확인 (닉네임 필드를 추가했을 경우)
+        // 닉네임 필드 확인
         if (signupDTO.getNickname() == null || signupDTO.getNickname().isEmpty()) {
             return ResponseDto.setFailed("닉네임을 입력하세요.");
         }
+        // 사용자 이름 확인
+        if (signupDTO.getUserName() == null || signupDTO.getUserName().isEmpty()) {
+            return ResponseDto.setFailed("사용자 이름을 입력하세요."); // 사용자 이름 입력 확인 추가
+        }
+
 
         // 전화번호 인증 로직 (API가 준비되면 추가)
         // TODO: 전화번호 인증 API 호출 로직 추가
@@ -83,5 +102,10 @@ public class UserService {
     private boolean isValidPassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         return password.matches(regex);
+    }
+    // **회원 조회 메소드**
+    public ResponseDto<User> getUserInfo(Long userNo) {
+
+        return null;
     }
 }

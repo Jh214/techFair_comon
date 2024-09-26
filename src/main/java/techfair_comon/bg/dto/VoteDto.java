@@ -1,23 +1,24 @@
 package techfair_comon.bg.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 import techfair_comon.entity.vote.Vote;
 import techfair_comon.entity.vote.VoteId;
 import techfair_comon.entity.vote.VoteType;
 
-@Getter @Setter
+@Data
+@Builder
 public class VoteDto {
     private Long userNo;
     private Long bgNo;
     private VoteType voteType;
 
     public static VoteDto fromEntity(Vote vote) {
-        VoteDto dto = new VoteDto();
-        dto.setUserNo(vote.getId().getUserNo());
-        dto.setBgNo(vote.getId().getBgNo());
-        dto.setVoteType(vote.getVoted());
-        return dto;
+        return VoteDto.builder()
+                .userNo(vote.getId().getUserNo())
+                .bgNo(vote.getId().getBgNo())
+                .voteType(vote.getVoted())
+                .build();
     }
 
     public Vote toEntity() {

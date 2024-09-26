@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import techfair_comon.ResponseDto;
 import techfair_comon.bg.dto.VoteDto;
+import techfair_comon.bg.dto.VoteResultDto;
 import techfair_comon.bg.service.BgService;
 import techfair_comon.bg.dto.CreateBgDto;
 import techfair_comon.bg.dto.GetBgDto;
+import techfair_comon.bg.service.VoteService;
 import techfair_comon.entity.Bg;
 
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api/bg")
 public class BgController {
     private final BgService bgService;
+    private final VoteService voteService;
 
     @PostMapping("/create") /*0924 userId 저장하는부분 미구현*/
     public ResponseDto<Void> createBg(@RequestBody @Valid CreateBgDto createBgDto) {
@@ -42,9 +45,4 @@ public class BgController {
         Bg bg = Bg.builder().bgNo(bgNo).build();
         return bgService.deleteBg(bg);
     }
-
-    /*@PostMapping("/vote")
-    public ResponseDto<Void> voteBg(@RequestBody @Valid VoteDto voteDto) {
-
-    }*/
 }

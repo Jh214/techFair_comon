@@ -10,7 +10,7 @@ import techfair_comon.bg.service.VoteService;
 import techfair_comon.bg.service.VoteServiceImpl;
 
 @Configuration
-public class BgConfig {
+public class DIConfig {
 
     @Bean
     public BgService bgService(BgRepository bgRepository) {

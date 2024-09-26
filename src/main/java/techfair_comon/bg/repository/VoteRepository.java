@@ -13,26 +13,25 @@ import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, VoteId> {
 
-    @Query("SELECT v.bg, v.voted, COUNT(v) FROM Vote v WHERE v.user.userNo =:#{#paramVote.id.userNo} GROUP BY v.voted")
+    @Query("SELECT v.bg, v.voted, COUNT(v) FROM Vote v WHERE v.user.userNo = :#{#paramVote.user.userNo} GROUP BY v.voted")
     List<Object[]> countVotesByVoteTypeGroupedByUser(@Param("paramVote") Vote vote);
 
-    @Query("SELECT v.bg, v.voted, COUNT(v) FROM Vote v WHERE v.bg.bgNo = :#{#paramVote.id.bgNo} GROUP BY v.voted")
+    @Query("SELECT v.bg, v.voted, COUNT(v) FROM Vote v WHERE v.bg.bgNo = :#{#paramVote.bg.bgNo} GROUP BY v.voted")
     List<Object[]> countVotesByVoteTypeGroupedByBg(@Param("paramVote") Vote vote);
 
     @Query("SELECT v.bg, v.voted, COUNT(v) FROM Vote v GROUP BY v.voted")
     List<Object[]> countAllVotesByVoteTypeGrouped();
 
-    @Query("SELECT v.voted FROM Vote v WHERE v.user.userNo = :#{#paramVote.id.userNo} AND v.bg.bgNo = :#{#paramVote.id.bgNo}")
+    @Query("SELECT v.voted FROM Vote v WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
     Optional<VoteType> findVotedByUserAndBg(@Param("paramVote") Vote vote);
 
     @Modifying
-    @Query("UPDATE Vote v SET v.voted = :#{#paramVote.voted} WHERE v.user.userNo = :#{paramVote.id.userNo} AND v.bg.bgNo = :#{#paramVote.id.bgNo}")
+    @Query("UPDATE Vote v SET v.voted = :#{#paramVote.voted} WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
     void updateVoteTypeByUserAndBg(@Param("paramVote") Vote vote);
 
     @Modifying
-    @Query("DELETE FROM Vote v WHERE v.user.userNo = :#{#paramVote.id.userNo} AND v.bg.bgNo = :#{#paramVote.id.bgNo}")
+    @Query("DELETE FROM Vote v WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
     void deleteVoteByUserAndBg(@Param("paramVote") Vote vote);
-
 
 
 }

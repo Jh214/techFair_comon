@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import techfair_comon.ResponseDto;
 import techfair_comon.bg.dto.VoteDto;
@@ -23,7 +25,6 @@ public class VoteServiceImpl implements VoteService{
     /**
      * {@inheritDoc}
      */
-    @Transactional
     @Override
     public ResponseDto<Void> saveVote(VoteDto voteDto) {
         Vote vote = voteDto.toEntity();
@@ -35,17 +36,20 @@ public class VoteServiceImpl implements VoteService{
             return ResponseDto.setFailed("Vote 생성에 실패했습니다., 데이터 무결성 위반: " + e.getMessage());
         } catch (Exception e) {
             ErrorMessage.ExceptionLog(e);
-            return ResponseDto.setFailed("Vote 생성에 실패했습니다. 오류: " + e.getMessage());
+            return ResponseDto.setFailed("알수없는오류가 발생했습니다. 오류 : " + e.getMessage());
         }
     }
     /**
      * {@inheritDoc}
      */
-    @Transactional
     @Override
     public ResponseDto<VoteResultDto> getVote(VoteDto voteDto) {
         try {
-            if(voteDto.getUserNo() != null) {
+            if (voteDto == null) {
+                List<Object[]> objects = voteRepository.countAllVotesByVoteTypeGrouped();
+                VoteResultDto voteResultDto = voteResultDtoMapper(objects);
+                return ResponseDto.setSuccessData("모든 vote 조회를 성공했습니다.", voteResultDto);
+            } else if(voteDto.getUserNo() != null) {
                 List<Object[]> votes = voteRepository.countVotesByVoteTypeGroupedByUser(voteDto.toEntity());
                 VoteResultDto voteResultDto = voteResultDtoMapper(votes);
                 return ResponseDto.setSuccessData("해당유저의 vote 조회를 성공했습니다.", voteResultDto);
@@ -53,23 +57,24 @@ public class VoteServiceImpl implements VoteService{
                     List<Object[]> votes = voteRepository.countVotesByVoteTypeGroupedByBg(voteDto.toEntity());
                     VoteResultDto voteResultDto = voteResultDtoMapper(votes);
                     return ResponseDto.setSuccessData("해당 Bg 의 vote 조회를 성공했습니다.", voteResultDto);
-            } else {
+            }/* else {
                 List<Object[]> objects = voteRepository.countAllVotesByVoteTypeGrouped();
                 VoteResultDto voteResultDto = voteResultDtoMapper(objects);
                 return ResponseDto.setSuccessData("모든 vote 조회를 성공했습니다.", voteResultDto);
+            }*/else {
+                return ResponseDto.setFailedData("유효한 파라미터가 없습니다.", null);
             }
         } catch (DataAccessException e) {
             ErrorMessage.DataAccessExceptionLog(e);
             return ResponseDto.setFailedData("데이터베이스 연결에 실패했습니다. 오류: " + e.getMessage(), null);
         } catch (Exception e) {
             ErrorMessage.ExceptionLog(e);
-            return ResponseDto.setFailedData("알수없는오류: " + e.getMessage(), null);
+            return ResponseDto.setFailedData("알수없는오류가 발생했습니다. 오류 : " + e.getMessage(), null);
         }
     }
     /**
      * {@inheritDoc}
      */
-    @Transactional
     @Override
     public ResponseDto<VoteDto> getVoteTypeInBgByUserNo(VoteDto voteDto) {
         try {
@@ -97,24 +102,12 @@ public class VoteServiceImpl implements VoteService{
         try {
             voteRepository.updateVoteTypeByUserAndBg(voteDto.toEntity());
             return ResponseDto.setSuccess("vote 업데이트에 성공했습니다.");
-        } catch (DataIntegrityViolationException e) {
-            ErrorMessage.DataIntegrityViolationExceptionLog(e);
-            return ResponseDto.setFailed("vote 업데이트에 실패했습니다. 데이터 무결성 위반: 해당 유저와 배경에 대한 투표 타입이 이미 존재합니다.");
-        } catch (EntityNotFoundException e) {
-            ErrorMessage.EntityNotFoundExceptionLog(e);
-            return ResponseDto.setFailed("업데이트 실패: 주어진 userNo와 bgNo에 해당하는 Vote 엔티티를 찾을 수 없습니다.");
-        } catch (TransactionRequiredException e) {
-            ErrorMessage.TransactionRequiredExceptionLog(e);
-            return ResponseDto.setFailed("업데이트 실패: 트랜잭션이 필요하지만 현재 활성화된 트랜잭션이 없습니다.");
-        } catch (IllegalArgumentException e) {
-            ErrorMessage.IllegalArgumentExceptionLog(e);
-            return ResponseDto.setFailed("업데이트 실패: 전달된 Vote 객체의 속성이 유효하지 않습니다. null 값이 포함되어 있습니다.");
-        }catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             ErrorMessage.DataAccessExceptionLog(e);
             return ResponseDto.setFailed("데이터베이스 연결에 실패했습니다. 오류: " + e.getMessage());
         } catch (Exception e) {
             ErrorMessage.ExceptionLog(e);
-            return ResponseDto.setFailed("업데이트 실패: 알 수 없는 오류 발생: " + e.getMessage());
+            return ResponseDto.setFailed("알수없는오류가 발생했습니다. 오류 : " + e.getMessage());
         }
     }
     /**
@@ -122,7 +115,16 @@ public class VoteServiceImpl implements VoteService{
      */
     @Override
     public ResponseDto<Void> deleteVote(VoteDto voteDto) {
-        return null;
+        try {
+            voteRepository.deleteVoteByUserAndBg(voteDto.toEntity());
+            return ResponseDto.setSuccess("vote 삭제에 성공했습니다.");
+        } catch (EmptyResultDataAccessException e) {
+            ErrorMessage.EmptyResultDataAccessExceptionLog(e);
+            return ResponseDto.setFailed("일치하는 데이터가 없습니다. 오류: " + e.getMessage());
+        } catch (Exception e) {
+            ErrorMessage.ExceptionLog(e);
+            return ResponseDto.setFailed("알수없는오류가 발생했습니다. 오류 : " + e.getMessage());
+        }
     }
 
 
@@ -136,10 +138,4 @@ public class VoteServiceImpl implements VoteService{
         });
         return voteResultDto;
     }
-
-
-
-
-
-
 }

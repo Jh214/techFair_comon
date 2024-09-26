@@ -15,10 +15,10 @@ public class CreateBgDto {
     private String bgTitle;
 
     public Bg toEntity() {
-        Bg bg = new Bg();
-        bg.setBgRed(this.bgRed);
-        bg.setBgBlue(this.bgBlue);
-        bg.setBgTitle(this.bgTitle);
-        return bg;
+        return Bg.builder()
+                .bgRed(this.bgRed)
+                .bgBlue(this.bgBlue)
+                .bgTitle(this.bgTitle)
+                .build();
     }
 }

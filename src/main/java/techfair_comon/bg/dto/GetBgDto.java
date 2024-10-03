@@ -25,13 +25,13 @@ public class GetBgDto {
     }
 
     public Bg toEntity() {
-        Bg bg = new Bg();
-        bg.setBgNo(this.bgNo);
-        bg.setBgRed(this.bgRed);
-        bg.setBgBlue(this.bgBlue);
-        bg.setBgTitle(this.bgTitle);
-        bg.setCreatedAt(this.createdAt);
-        return bg;
+        return Bg.builder()
+                .bgNo(this.bgNo)
+                .bgRed(this.bgRed)
+                .bgBlue(this.bgBlue)
+                .bgTitle(this.bgTitle)
+                .createdAt(this.createdAt)
+                .build();
     }
 
 }

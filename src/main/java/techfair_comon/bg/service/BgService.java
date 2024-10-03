@@ -1,4 +1,4 @@
-package techfair_comon.bg;
+package techfair_comon.bg.service;
 
 import techfair_comon.ResponseDto;
 import techfair_comon.bg.dto.CreateBgDto;

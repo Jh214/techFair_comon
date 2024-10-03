@@ -32,7 +32,7 @@ public class UserService {
     //@Autowired
     private final UserRepository userRepository; // UserRepository 주입
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
 
     // 사용자 가입 메소드
     public ResponseDto<Void> signup(SignupDTO signupDTO) {
@@ -63,9 +63,11 @@ public class UserService {
         // 사용자 객체 생성 및 저장
         User user = new User();
         user.setUserId(signupDTO.getUserId());
-        user.setUserPw(passwordEncoder.encode(userPw)); // 비밀번호 해싱
+        user.setUserPw(bCryptPasswordEncoder.encode(userPw)); // 비밀번호 해싱
         user.setUserName(signupDTO.getUserName());
-        user.setUserTel(signupDTO.getUserTel());
+       // user.setUserTel(signupDTO.getUserTel());
+        user.setUserTel(bCryptPasswordEncoder.encode(signupDTO.getUserTel()));
+
 
         // 데이터베이스에 저장
         try {
@@ -88,7 +90,7 @@ public class UserService {
         Optional<User> byId = userRepository.findById(loginDTO.getUserNo()); // ID로 사용자 조회
         // 비밀번호 확인
         if (byId.isPresent()) {
-            if (passwordEncoder.matches(loginDTO.getUserPw(), byId.get().getUserPw())) {
+            if (bCryptPasswordEncoder.matches(loginDTO.getUserPw(), byId.get().getUserPw())) {
                 return ResponseDto.setSuccess("로그인 성공");
             } else {
                 return ResponseDto.setFailed("로그인 실패");

@@ -1,18 +1,16 @@
 /*
     작성자: 이동주
-    버전: 17
-    기능: 로그인, 회원가입
+    버전: 18
+    기능: 로그인, 회원가입, 전화번호 인증
 
     작성자: 김주현
-    버전: 17
+    버전: 18
     기능: 회원조회, 수정
-
  */
 
 package techfair_comon.user.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,31 +21,30 @@ import techfair_comon.ResponseDto; // ResponseDto 임포트
 import techfair_comon.user.repository.UserRepository; // UserRepository 임포트
 
 import java.util.Optional;
+import techfair_comon.user.service.KakaoTalkService; // KakaoTalkService 임포트
 
 @Service
 @AllArgsConstructor
-
 public class UserService {
 
-    //@Autowired
     private final UserRepository userRepository; // UserRepository 주입
-
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
+    private final KakaoTalkService kakaoTalkService; // KakaoTalkService 주입
 
     // 사용자 가입 메소드
     public ResponseDto<Void> signup(SignupDTO signupDTO) {
-        // 닉네임 필드 확인
-        if (signupDTO.getNickname() == null || signupDTO.getNickname().isEmpty()) {
-            return ResponseDto.setFailed("닉네임을 입력하세요.");
-        }
         // 사용자 이름 확인
         if (signupDTO.getUserName() == null || signupDTO.getUserName().isEmpty()) {
-            return ResponseDto.setFailed("사용자 이름을 입력하세요."); // 사용자 이름 입력 확인 추가
+            return ResponseDto.setFailed("사용자 이름을 입력하세요.");
         }
 
+        // 전화번호 인증 로직 (카카오톡 API를 통해 인증번호 전송)
+        boolean isSent = kakaoTalkService.sendCertificationCode(signupDTO.getUserTel()); // 인증번호 전송
+        if (!isSent) {
+            return ResponseDto.setFailed("인증번호 전송에 실패했습니다.");
+        }
 
-        // 전화번호 인증 로직 (API가 준비되면 추가)
-        // TODO: 전화번호 인증 API 호출 로직 추가
+        // 템플릿의 #{certification}과 사용자 입력값을 비교하는 로직은 프론트엔드에서 구현됨.
 
         // 비밀번호 검증
         String userPw = signupDTO.getUserPw();
@@ -65,9 +62,7 @@ public class UserService {
         user.setUserId(signupDTO.getUserId());
         user.setUserPw(bCryptPasswordEncoder.encode(userPw)); // 비밀번호 해싱
         user.setUserName(signupDTO.getUserName());
-       // user.setUserTel(signupDTO.getUserTel());
-        user.setUserTel(bCryptPasswordEncoder.encode(signupDTO.getUserTel()));
-
+        user.setUserTel(signupDTO.getUserTel()); // 전화번호 저장
 
         // 데이터베이스에 저장
         try {
@@ -105,8 +100,11 @@ public class UserService {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         return password.matches(regex);
     }
+
     // **회원 조회 메소드**
     public ResponseDto<User> getUserInfo(Long userNo) {
+        // 사용자 정보 조회 로직
+        Optional<User> user = userRepository.findById(userNo);
 
         return null;
     }

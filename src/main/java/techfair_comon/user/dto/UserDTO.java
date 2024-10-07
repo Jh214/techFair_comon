@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDTO {
-    private Long userId;    // PK: 사용자 ID
+    private Long userNo;    // PK: 사용자 ID
     private String userTel; // 전화번호
     private String userPw;  // 비밀번호
     private String userName; // 이름

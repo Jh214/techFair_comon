@@ -11,26 +11,26 @@
 
 package techfair_comon.user.service;
 
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import techfair_comon.entity.User; // User 엔티티 임포트
-import techfair_comon.user.dto.LoginDTO; // LoginDTO 임포트
-import techfair_comon.user.dto.SignupDTO; // SignupDTO 임포트
+
+import lombok.AllArgsConstructor;
 import techfair_comon.ResponseDto; // ResponseDto 임포트
+import techfair_comon.entity.User; // User 엔티티 임포트
+import techfair_comon.security.service.UserContext;
+import techfair_comon.user.dto.SignupDTO; // SignupDTO 임포트
+import techfair_comon.user.dto.UserDTO;
 import techfair_comon.user.repository.UserRepository; // UserRepository 임포트
 
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-
 public class UserService {
-
-    //@Autowired
     private final UserRepository userRepository; // UserRepository 주입
+
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
 
@@ -65,7 +65,7 @@ public class UserService {
         user.setUserId(signupDTO.getUserId());
         user.setUserPw(bCryptPasswordEncoder.encode(userPw)); // 비밀번호 해싱
         user.setUserName(signupDTO.getUserName());
-       // user.setUserTel(signupDTO.getUserTel());
+        // user.setUserTel(signupDTO.getUserTel());
         user.setUserTel(bCryptPasswordEncoder.encode(signupDTO.getUserTel()));
 
 
@@ -79,25 +79,18 @@ public class UserService {
         return ResponseDto.setSuccess("회원가입 성공");
     }
 
-    // 로그인 메소드
-    public ResponseDto<Void> login(LoginDTO loginDTO) {
-        // 입력 검증
-        if (loginDTO.getUserNo() == null || loginDTO.getUserPw() == null) {
-            return ResponseDto.setFailed("아이디 또는 비밀번호를 입력하세요.");
-        }
+    public ResponseDto<?> getUserInfo(Authentication authentication) {
 
-        // 사용자 정보 조회
-        Optional<User> byId = userRepository.findById(loginDTO.getUserNo()); // ID로 사용자 조회
-        // 비밀번호 확인
-        if (byId.isPresent()) {
-            if (bCryptPasswordEncoder.matches(loginDTO.getUserPw(), byId.get().getUserPw())) {
-                return ResponseDto.setSuccess("로그인 성공");
-            } else {
-                return ResponseDto.setFailed("로그인 실패");
-            }
-        } else {
-            return ResponseDto.setFailed("로그인 실패");
-        }
+       UserContext userContext = (UserContext) authentication.getPrincipal();
+
+       User user = userRepository.findById(userContext.getUserNo()).get();
+
+       UserDTO userDto = new UserDTO();
+       userDto.setUserNo(user.getUserNo());
+       userDto.setUserTel(user.getUserTel());
+       userDto.setUserName(user.getUserName());
+
+        return ResponseDto.setSuccessData("로그인 성공", userDto);
     }
 
     // 비밀번호 유효성 검사 메소드
@@ -105,6 +98,7 @@ public class UserService {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         return password.matches(regex);
     }
+
     // **회원 조회 메소드**
     public ResponseDto<User> getUserInfo(Long userNo) {
 

@@ -10,11 +10,9 @@
 
 package techfair_comon.user.service;
 
-<<<<<<< HEAD
-
-=======
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
->>>>>>> 2b5d65dc767812639ba2513b1bd1b56fab63e82e
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,23 +26,15 @@ import techfair_comon.user.dto.SignupDTO; // SignupDTO 임포트
 import techfair_comon.user.dto.UserDTO;
 import techfair_comon.user.repository.UserRepository; // UserRepository 임포트
 
-<<<<<<< HEAD
-=======
+
 import java.util.Optional;
 import techfair_comon.user.service.KakaoTalkService; // KakaoTalkService 임포트
->>>>>>> 2b5d65dc767812639ba2513b1bd1b56fab63e82e
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Transactional
 public class UserService {
-<<<<<<< HEAD
     private final UserRepository userRepository; // UserRepository 주입
-
-
-=======
-
-    private final UserRepository userRepository; // UserRepository 주입
->>>>>>> 2b5d65dc767812639ba2513b1bd1b56fab63e82e
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
     private final KakaoTalkService kakaoTalkService; // KakaoTalkService 주입
 
@@ -79,13 +69,10 @@ public class UserService {
         user.setUserId(signupDTO.getUserId());
         user.setUserPw(bCryptPasswordEncoder.encode(userPw)); // 비밀번호 해싱
         user.setUserName(signupDTO.getUserName());
-<<<<<<< HEAD
         // user.setUserTel(signupDTO.getUserTel());
         user.setUserTel(bCryptPasswordEncoder.encode(signupDTO.getUserTel()));
 
-=======
         user.setUserTel(signupDTO.getUserTel()); // 전화번호 저장
->>>>>>> 2b5d65dc767812639ba2513b1bd1b56fab63e82e
 
         // 데이터베이스에 저장
         try {

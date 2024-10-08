@@ -12,7 +12,7 @@ public class ResponseDto<D> {
     private D data;
 
     public static ResponseDto<Void> setSuccess(String message) {
-            return ResponseDto.set(true, message, "200", null);
+        return ResponseDto.set(true, message, "200", null);
     }
 
     public static ResponseDto<Void> setFailed(String message) {
@@ -25,5 +25,9 @@ public class ResponseDto<D> {
 
     public static <D> ResponseDto<D> setFailedData(String message, D data) {
         return ResponseDto.set(false, message, "400", data);
+    }
+
+    public static <D> ResponseDto<D> setAuthFailedData(String message, String status, D data) {
+        return ResponseDto.set(false, message, status, data);
     }
 }

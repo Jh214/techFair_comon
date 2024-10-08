@@ -3,7 +3,10 @@ package techfair_comon.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import techfair_comon.entity.comment.Comment;
 import techfair_comon.user.enums.Grade;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,5 +33,12 @@ public class User {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Grade role;
+
+//    Bg엔티티 join
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bg> bg;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comment;
 
 }

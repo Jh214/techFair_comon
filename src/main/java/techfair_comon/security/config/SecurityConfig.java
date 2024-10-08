@@ -45,19 +45,19 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(getCorsConfigurerCustomizer())
-                .authorizeHttpRequests(getAuthorizationManagerRequestMatcherRegistryCustomizer())
+                //.authorizeHttpRequests(getAuthorizationManagerRequestMatcherRegistryCustomizer())
                 .exceptionHandling(getExceptionHandlingConfigurerCustomizer()) // exception handling 할 때 우리가 만든 클래스를 추가.
                 .sessionManagement(getSessionManagementConfigurerCustomizer()) // 시큐리티는 기본적으로 세션을 사용하지만, 여기서는 세션을 사용하지 않기 때문에 세션 설정을 Stateless 로 설정.
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // Add a filter to validate the tokens with every request
                 .build();
     }
 
-    @NotNull
-    private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> getAuthorizationManagerRequestMatcherRegistryCustomizer() {
-        return authorize -> authorize
-                .requestMatchers(PERMIT_ALL).permitAll()
-                .anyRequest().authenticated();
-    }
+    //@NotNull
+    //private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> getAuthorizationManagerRequestMatcherRegistryCustomizer() {
+      //  return authorize -> authorize
+        //        .requestMatchers(PERMIT_ALL).permitAll()
+          //      .anyRequest().authenticated();
+    //}
 
     @NotNull
     private Customizer<CorsConfigurer<HttpSecurity>> getCorsConfigurerCustomizer() {

@@ -1,42 +1,24 @@
-/*
-    작성자: 이동주
-    버전: 18
-    기능: 로그인, 회원가입, 전화번호 인증
-
-    작성자: 김주현
-    버전: 18
-    기능: 회원조회, 수정
- */
-
 package techfair_comon.user.service;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import lombok.AllArgsConstructor;
-import techfair_comon.ResponseDto; // ResponseDto 임포트
-import techfair_comon.entity.User; // User 엔티티 임포트
-import techfair_comon.security.service.UserContext;
-import techfair_comon.user.dto.SignupDTO; // SignupDTO 임포트
-import techfair_comon.user.dto.UserDTO;
-import techfair_comon.user.repository.UserRepository; // UserRepository 임포트
-
+import techfair_comon.entity.User;
+import techfair_comon.user.dto.LoginDTO;
+import techfair_comon.user.dto.SignupDTO;
+import techfair_comon.ResponseDto;
+import techfair_comon.user.repository.UserRepository;
 
 import java.util.Optional;
-import techfair_comon.user.service.KakaoTalkService; // KakaoTalkService 임포트
 
 @Service
-@RequiredArgsConstructor
-@Transactional
+@AllArgsConstructor
 public class UserService {
-    private final UserRepository userRepository; // UserRepository 주입
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(); // 비밀번호 해싱을 위한 인코더
-    private final KakaoTalkService kakaoTalkService; // KakaoTalkService 주입
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final CoolSmsService coolSmsService;
 
     // 사용자 가입 메소드
     public ResponseDto<Void> signup(SignupDTO signupDTO) {
@@ -45,17 +27,20 @@ public class UserService {
             return ResponseDto.setFailed("사용자 이름을 입력하세요.");
         }
 
-        // 전화번호 인증 로직 (카카오톡 API를 통해 인증번호 전송)
-        boolean isSent = kakaoTalkService.sendCertificationCode(signupDTO.getUserTel()); // 인증번호 전송
-        if (!isSent) {
+        // 전화번호 확인
+        if (signupDTO.getUserTel() == null || signupDTO.getUserTel().isEmpty()) {
+            return ResponseDto.setFailed("전화번호를 입력하세요.");
+        }
+
+        // 전화번호 인증 로직 (CoolSMS API를 통해 인증번호 전송)
+        String sendResult = coolSmsService.sendCertificationCode(signupDTO.getUserTel()); // 입력한 전화번호로 인증번호 전송
+        if (!sendResult.equals("인증번호가 발송되었습니다.")) {
             return ResponseDto.setFailed("인증번호 전송에 실패했습니다.");
         }
 
-        // 템플릿의 #{certification}과 사용자 입력값을 비교하는 로직은 프론트엔드에서 구현됨.
-
         // 비밀번호 검증
         String userPw = signupDTO.getUserPw();
-        String confirmUserPw = signupDTO.getConfirmUserPw(); // confirmUserPw 필드를 SignupDTO에 추가했을 경우
+        String confirmUserPw = signupDTO.getConfirmUserPw();
         if (!userPw.equals(confirmUserPw)) {
             return ResponseDto.setFailed("비밀번호가 일치하지 않습니다.");
         }
@@ -67,11 +52,8 @@ public class UserService {
         // 사용자 객체 생성 및 저장
         User user = new User();
         user.setUserId(signupDTO.getUserId());
-        user.setUserPw(bCryptPasswordEncoder.encode(userPw)); // 비밀번호 해싱
+        user.setUserPw(bCryptPasswordEncoder.encode(userPw));
         user.setUserName(signupDTO.getUserName());
-        // user.setUserTel(signupDTO.getUserTel());
-        user.setUserTel(bCryptPasswordEncoder.encode(signupDTO.getUserTel()));
-
         user.setUserTel(signupDTO.getUserTel()); // 전화번호 저장
 
         // 데이터베이스에 저장
@@ -84,18 +66,25 @@ public class UserService {
         return ResponseDto.setSuccess("회원가입 성공");
     }
 
-    public ResponseDto<?> getUserInfo(Authentication authentication) {
+    // 로그인 메소드
+    public ResponseDto<Void> login(LoginDTO loginDTO) {
+        // 입력 검증
+        if (loginDTO.getUserId() == null || loginDTO.getUserPw() == null) {
+            return ResponseDto.setFailed("아이디 또는 비밀번호를 입력하세요.");
+        }
 
-       UserContext userContext = (UserContext) authentication.getPrincipal();
+        // 사용자 정보 조회 (User를 반환하도록 수정)
+        User byUserId = userRepository.findByUserId(loginDTO.getUserId()); // userId로 사용자 조회
+        if (byUserId == null) {
+            return ResponseDto.setFailed("로그인 실패: 사용자 ID가 존재하지 않습니다.");
+        }
 
-       User user = userRepository.findById(userContext.getUserNo()).get();
-
-       UserDTO userDto = new UserDTO();
-       userDto.setUserNo(user.getUserNo());
-       userDto.setUserTel(user.getUserTel());
-       userDto.setUserName(user.getUserName());
-
-        return ResponseDto.setSuccessData("로그인 성공", userDto);
+        // 비밀번호 확인
+        if (bCryptPasswordEncoder.matches(loginDTO.getUserPw(), byUserId.getUserPw())) {
+            return ResponseDto.setSuccess("로그인 성공");
+        } else {
+            return ResponseDto.setFailed("로그인 실패: 비밀번호가 일치하지 않습니다.");
+        }
     }
 
     // 비밀번호 유효성 검사 메소드
@@ -104,11 +93,11 @@ public class UserService {
         return password.matches(regex);
     }
 
-    // **회원 조회 메소드**
+    // 회원 조회 메소드
     public ResponseDto<User> getUserInfo(Long userNo) {
         // 사용자 정보 조회 로직
         Optional<User> user = userRepository.findById(userNo);
 
-        return null;
+        return null;  // 실제 구현 필요
     }
 }

@@ -25,9 +25,9 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         // Content-Type이 JSON인지 확인
-        if (!request.getContentType().equalsIgnoreCase("application/json")) {
-            throw new AuthenticationException("Content-Type must be application/json") {};
-        }
+//        if (!request.getContentType().equalsIgnoreCase("application/json")) { //NullPointException 발생
+//            throw new AuthenticationException("Content-Type must be application/json") {};
+//        }
 
         // 요청 본문에서 JSON 데이터 읽기
         try {

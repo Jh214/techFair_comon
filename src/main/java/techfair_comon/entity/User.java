@@ -1,9 +1,9 @@
 package techfair_comon.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import techfair_comon.entity.comment.Comment;
+import techfair_comon.entity.vote.Vote;
 import techfair_comon.user.enums.Grade;
 
 import java.util.List;
@@ -11,6 +11,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -40,5 +43,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> vote;
 
 }

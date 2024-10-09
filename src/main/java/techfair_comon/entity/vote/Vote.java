@@ -22,16 +22,16 @@ public class Vote {
     private VoteId id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "voted", nullable = false)
-    private VoteType voted;
+    @Column(name = "voteType", nullable = false)
+    private VoteType voteType;
 
     @MapsId("userNo")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no", insertable = false, updatable = false)
     private User user;
 
     @MapsId("bgNo")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "bg_no", insertable = false, updatable = false)
     private Bg bg;

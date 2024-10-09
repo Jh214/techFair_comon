@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import techfair_comon.entity.comment.Comment;
+import techfair_comon.entity.vote.Vote;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,5 +45,8 @@ public class Bg {
 //  comment 엔티티 join
     @OneToMany(mappedBy = "bg", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comment;
+
+    @OneToMany(mappedBy = "bg", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> vote;
 
 }

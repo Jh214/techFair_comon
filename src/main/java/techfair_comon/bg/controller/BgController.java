@@ -2,15 +2,15 @@ package techfair_comon.bg.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import techfair_comon.ResponseDto;
-import techfair_comon.bg.dto.VoteDto;
-import techfair_comon.bg.dto.VoteResultDto;
 import techfair_comon.bg.service.BgService;
 import techfair_comon.bg.dto.CreateBgDto;
 import techfair_comon.bg.dto.GetBgDto;
 import techfair_comon.bg.service.VoteService;
 import techfair_comon.entity.Bg;
+import techfair_comon.entity.User;
 
 import java.util.List;
 
@@ -24,8 +24,9 @@ public class BgController {
     private final BgService bgService;
     private final VoteService voteService;
 
-    @PostMapping("/create") /*0924 userId 저장하는부분 미구현*/
-    public ResponseDto<Void> createBg(@RequestBody @Valid CreateBgDto createBgDto) {
+    @PostMapping("/create")
+    public ResponseDto<Void> createBg(@RequestBody @Valid CreateBgDto createBgDto, Authentication authentication) {
+        createBgDto.setUser(DecodeJwt.toUserNo(authentication));
         return bgService.createBg(createBgDto);
     }
 
@@ -40,9 +41,13 @@ public class BgController {
         return bgService.getBgByBgId(bg);
     }
 
-    @DeleteMapping("/{bgNo}") /*0924 현재접속 userId로 삭제권한 부여 미구현*/
-    public ResponseDto<Void> deleteBg(@PathVariable("bgNo") Long bgNo) {
-        Bg bg = Bg.builder().bgNo(bgNo).build();
+    @DeleteMapping("/{bgNo}")
+    public ResponseDto<Void> deleteBg(@PathVariable("bgNo") Long bgNo, Authentication authentication) {
+        Bg bg = Bg.builder()
+                .bgNo(bgNo)
+                .user(DecodeJwt.toUserNo(authentication))
+                .build();
         return bgService.deleteBg(bg);
     }
+
 }

@@ -1,5 +1,6 @@
 package techfair_comon.bg.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -71,16 +72,19 @@ public class BgServiceImpl implements BgService{
      */
     @Override
     public ResponseDto<Void> deleteBg(Bg bg) {
-        /*
-        * 여기에 현재 접속유저 == 관리자 || 게임작성자인지 확인하는 로직
-        * */
-        try {
-            bgRepository.deleteById(bg.getBgNo());
-            return ResponseDto.setSuccess("Bg가 성공적으로 삭제되었습니다.");
-        } catch (EmptyResultDataAccessException ignored) {
+        Long userNoByBgNo = bgRepository.findUserNoByBgNo(bg.getBgNo());
+        if(userNoByBgNo == null) {
             return ResponseDto.setFailed("BgNo 와 일치하는 Bg가 없습니다.");
-        } catch (Exception e) {
-            return ResponseDto.setFailed("Bg 삭제에 실패했습니다. 오류: " + e.getMessage());
+        }
+        if(bg.getUser().getUserNo() == 0 /*관리자 번호*/ || bg.getUser().getUserNo() == userNoByBgNo) {
+            try {
+                bgRepository.deleteById(bg.getBgNo());
+                return ResponseDto.setSuccess("Bg가 성공적으로 삭제되었습니다.");
+            } catch (Exception e) {
+                return ResponseDto.setFailed("Bg 삭제에 실패했습니다. 오류: " + e.getMessage());
+            }
+        } else {
+            return ResponseDto.setFailed("삭제할수 있는 권한이 없습니다.");
         }
     }
 }

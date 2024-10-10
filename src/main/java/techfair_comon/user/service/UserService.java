@@ -32,11 +32,7 @@ public class UserService {
             return ResponseDto.setFailed("전화번호를 입력하세요.");
         }
 
-        // 전화번호 인증 로직 (CoolSMS API를 통해 인증번호 전송)
-        String sendResult = coolSmsService.sendCertificationCode(signupDTO.getUserTel()); // 입력한 전화번호로 인증번호 전송
-        if (!sendResult.equals("인증번호가 발송되었습니다.")) {
-            return ResponseDto.setFailed("인증번호 전송에 실패했습니다.");
-        }
+
 
         // 비밀번호 검증
         String userPw = signupDTO.getUserPw();
@@ -47,6 +43,11 @@ public class UserService {
 
         if (!isValidPassword(userPw)) {
             return ResponseDto.setFailed("비밀번호는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+        }
+        // 전화번호 인증 로직 (CoolSMS API를 통해 인증번호 전송)
+        String sendResult = coolSmsService.sendCertificationCode(signupDTO.getUserTel()); // 입력한 전화번호로 인증번호 전송
+        if (!sendResult.equals("인증번호가 발송되었습니다.")) {
+            return ResponseDto.setFailed("인증번호 전송에 실패했습니다.");
         }
 
         // 사용자 객체 생성 및 저장

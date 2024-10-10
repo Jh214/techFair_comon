@@ -7,6 +7,7 @@ import techfair_comon.entity.User;
 
 import java.time.LocalDateTime;
 
+
 @Getter @Setter
 public class GetBgDto {
     private Long bgNo;
@@ -23,6 +24,7 @@ public class GetBgDto {
         dto.setBgBlue(bg.getBgBlue());
         dto.setBgTitle(bg.getBgTitle());
         dto.setCreatedAt(bg.getCreatedAt());
+
         dto.setUserNo(bg.getUser() != null ? bg.getUser().getUserNo() : null);
         return dto;
     }

@@ -5,9 +5,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import techfair_comon.ResponseDto;
+import techfair_comon.bg.dto.*;
 import techfair_comon.bg.service.BgService;
-import techfair_comon.bg.dto.CreateBgDto;
-import techfair_comon.bg.dto.GetBgDto;
 import techfair_comon.bg.service.VoteService;
 import techfair_comon.entity.Bg;
 import techfair_comon.entity.User;
@@ -37,17 +36,23 @@ public class BgController {
 
     @GetMapping("/{bgNo}")
     public ResponseDto<GetBgDto> getBgById(@PathVariable("bgNo") Long bgNo) {
-        Bg bg = Bg.builder().bgNo(bgNo).build();
-        return bgService.getBgByBgId(bg);
+        BgDto bgDto = BgDto.builder().bgNo(bgNo).build();
+        return bgService.getBgByBgId(bgDto);
     }
 
     @DeleteMapping("/{bgNo}")
     public ResponseDto<Void> deleteBg(@PathVariable("bgNo") Long bgNo, Authentication authentication) {
-        Bg bg = Bg.builder()
+        BgDto bgDto = BgDto.builder()
                 .bgNo(bgNo)
                 .user(DecodeJwt.toUserNo(authentication))
                 .build();
-        return bgService.deleteBg(bg);
+        return bgService.deleteBg(bgDto);
+    }
+
+    @PatchMapping("/report/{bgNo}")
+    public ResponseDto<Void> reportBg(@PathVariable("bgNo") Long bgNo, Authentication authentication) {
+        ReportDto reportDto = ReportDto.builder().bg(Bg.builder().bgNo(bgNo).build()).user(DecodeJwt.toUserNo(authentication)).build();
+        return bgService.reportBg(reportDto);
     }
 
 }

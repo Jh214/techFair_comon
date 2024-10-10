@@ -11,6 +11,7 @@ import techfair_comon.bg.service.VoteService;
 import techfair_comon.entity.Bg;
 import techfair_comon.entity.User;
 import techfair_comon.entity.vote.VoteId;
+import techfair_comon.entity.vote.VoteType;
 
 @RestController
 @AllArgsConstructor
@@ -43,16 +44,30 @@ public class VoteController {
         return voteService.getVote(voteDto);
     }
 
+    @GetMapping("/voteType/{bgNo}")
+    public ResponseDto<VoteType> getUserVoteType(@PathVariable("bgNo") Long bgNo, Authentication authentication) {
+        VoteDto voteDto = VoteDto.builder()
+                .user(DecodeJwt.toUserNo(authentication))
+                .bg(Bg.builder().bgNo(bgNo).build())
+                .build();
+        return voteService.getVoteTypeInBgByUserNo(voteDto);
+    }
+
     @PatchMapping("/{bgNo}") /*userId값 토큰에서 불러와서 넣기*/
     public ResponseDto<Void> updateVote(@PathVariable("bgNo") Long bgNo, @RequestBody VoteDto voteDto, Authentication authentication) {
         voteDto.setBg(Bg.builder().bgNo(bgNo).build());
         voteDto.setUser(DecodeJwt.toUserNo(authentication));
         return voteService.updateVote(voteDto);
     }
-//
-//    @DeleteMapping("/{bgNo}") /*userId값 토큰에서 불러와서 넣기*/
-//    public ResponseDto<Void> deleteVote(@PathVariable("bgNo") Long bgNo) {
-//        VoteDto voteDto = VoteDto.builder().bgNo(bgNo).build();
-//        return voteService.deleteVote(voteDto);
-//    }
+
+    @DeleteMapping("/{bgNo}") /*userId값 토큰에서 불러와서 넣기*/
+    public ResponseDto<Void> deleteVote(@PathVariable("bgNo") Long bgNo, Authentication authentication) {
+        VoteDto voteDto = VoteDto.builder()
+                .bg(Bg.builder()
+                        .bgNo(bgNo)
+                        .build())
+                .user(DecodeJwt.toUserNo(authentication))
+                .build();
+        return voteService.deleteVote(voteDto);
+    }
 }

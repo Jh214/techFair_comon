@@ -3,6 +3,7 @@ package techfair_comon.bg.service;
 import techfair_comon.ResponseDto;
 import techfair_comon.bg.dto.VoteDto;
 import techfair_comon.bg.dto.VoteResultDto;
+import techfair_comon.entity.vote.VoteType;
 
 public interface VoteService {
     /**
@@ -21,12 +22,12 @@ public interface VoteService {
      */
     ResponseDto<VoteResultDto> getVote(VoteDto voteDto);
 
-//    /**
-//     *
-//     * @param voteDto null 값이 아닌 userNo, bgNo 을 포함해야합니다.
-//     * @return 현재 접속유저의 해당게임 투표 결과를 voteType 으로 리턴합니다.
-//     */
-//    ResponseDto<VoteDto> getVoteTypeInBgByUserNo(VoteDto voteDto);
+    /**
+     *
+     * @param voteDto null 값이 아닌 userNo, bgNo 을 포함해야합니다.
+     * @return 현재 접속유저의 해당게임 투표 결과를 voteType 으로 리턴합니다.
+     */
+    ResponseDto<VoteType> getVoteTypeInBgByUserNo(VoteDto voteDto);
 
     /**
      *
@@ -35,10 +36,10 @@ public interface VoteService {
      */
     ResponseDto<Void> updateVote(VoteDto voteDto);
 
-//    /**
-//     *
-//     * @param voteDto 투표정보를 담고있는 DTO 로,
-//     *                null 값이아닌 userNo, bgNo 필드를 포함해야합니다.
-//     */
-//    ResponseDto<Void> deleteVote(VoteDto voteDto);
+    /**
+     *
+     * @param voteDto 투표정보를 담고있는 DTO 로,
+     *                null 값이아닌 userNo, bgNo 필드를 포함해야합니다.
+     */
+    ResponseDto<Void> deleteVote(VoteDto voteDto);
 }

@@ -28,12 +28,17 @@ public interface VoteRepository extends JpaRepository<Vote, VoteId> {
     @Query("SELECT v.voteType FROM Vote v WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
     Optional<VoteType> findVotedByUserAndBg(@Param("paramVote") Vote vote);
 
+    @Transactional
     @Modifying
     @Query("UPDATE Vote v SET v.voteType = :#{#paramVote.voteType} WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
-    void updateVoteTypeByUserAndBg(@Param("paramVote") Vote vote);
+    int updateVoteTypeByUserAndBg(@Param("paramVote") Vote vote);
 
+    @Transactional
     @Modifying
     @Query("DELETE FROM Vote v WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
-    void deleteVoteByUserAndBg(@Param("paramVote") Vote vote);
+    int deleteVoteByUserAndBg(@Param("paramVote") Vote vote);
+
+    @Query("SELECT COUNT(*) FROM Vote v WHERE v.user.userNo = :#{#paramVote.user.userNo} AND v.bg.bgNo = :#{#paramVote.bg.bgNo}")
+    int authByUserNo(@Param("paramVote") Vote vote);
 
 }

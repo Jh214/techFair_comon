@@ -14,8 +14,6 @@ import techfair_comon.entity.vote.VoteType;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class VoteDto {
     private Long userNo;
     private Long bgNo;

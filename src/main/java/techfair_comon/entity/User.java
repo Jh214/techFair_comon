@@ -3,6 +3,7 @@ package techfair_comon.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import techfair_comon.entity.comment.Comment;
+import techfair_comon.entity.report.Report;
 import techfair_comon.entity.vote.Vote;
 import techfair_comon.user.enums.Grade;
 
@@ -46,5 +47,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> vote;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> report;
 
 }

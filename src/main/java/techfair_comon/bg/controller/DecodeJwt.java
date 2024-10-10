@@ -6,9 +6,10 @@ import techfair_comon.security.service.UserContext;
 
 public class DecodeJwt {
     public static User toUserNo(Authentication authentication) {
-        User user = new User();
+        if(authentication == null) return null;
         UserContext userContext = (UserContext) authentication.getPrincipal();
-        user.setUserNo(userContext.getUserNo());
-        return user;
+        return User.builder()
+                .userNo(userContext.getUserNo())
+                .build();
     }
 }

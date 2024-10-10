@@ -12,6 +12,7 @@ import techfair_comon.bg.repository.ReportRepository;
 import techfair_comon.entity.Bg;
 import techfair_comon.entity.report.Report;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class BgServiceImpl implements BgService{
     @Override
     public ResponseDto<Void> createBg(CreateBgDto createBgDto) {
         Bg bg = createBgDto.toEntity();
+        if(bg.getUser() == null) return ResponseDto.setFailed("토큰에 오류가 생겼습니다.");
         try {
             Bg save = bgRepository.save(bg);
             return ResponseDto.setSuccess("Bg가 성공적으로 생성되었습니다.");
@@ -71,6 +73,7 @@ public class BgServiceImpl implements BgService{
     @Override
     public ResponseDto<Void> deleteBg(BgDto bgDto) {
         Bg bg = bgDto.toEntity();
+        if(bg.getUser() == null) return ResponseDto.setFailed("토큰에 오류가 생겼습니다.");
         Long userNoByBgNo = bgRepository.findUserNoByBgNo(bg.getBgNo());
         if(userNoByBgNo == null) {
             return ResponseDto.setFailed("BgNo 와 일치하는 Bg가 없습니다.");
@@ -90,12 +93,19 @@ public class BgServiceImpl implements BgService{
     @Override
     public ResponseDto<Void> reportBg(ReportDto reportDto) {
         Report report = reportDto.toEntity();
-        reportRepository.save(report);
-        if(reportRepository.countReportByBgNo(report) >= 2) {
-            bgRepository.deleteById(report.getBg().getBgNo());
-            return ResponseDto.setSuccess("신고수가 일정수준을 넘어 bg 가 삭제되었습니다.");
-        } else {
-            return ResponseDto.setSuccess("성공적으로 처리되었습니다.");
+        try {
+            reportRepository.save(report);
+            if (reportRepository.countReportByBgNo(report) >= 2) {
+                bgRepository.deleteById(report.getBg().getBgNo());
+                return ResponseDto.setSuccess("신고수가 일정수준을 넘어 bg 가 삭제되었습니다.");
+            } else {
+                return ResponseDto.setSuccess("성공적으로 처리되었습니다.");
+            }
+        } catch (DataIntegrityViolationException e) {
+            ErrorMessage.DataIntegrityViolationExceptionLog(e);
+            return ResponseDto.setFailed("이미 신고한 bg 거나 존재하지 않는 bg입니다.");
+        } catch (Exception e) {
+            return ResponseDto.setFailed("알수없는 오류가 발생했습니다");
         }
     }
 
